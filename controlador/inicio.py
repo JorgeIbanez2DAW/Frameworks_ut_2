@@ -23,6 +23,7 @@ def cargar_configuracion() -> dict[str, str]:
                 "usuario": f.readline().strip().split("=")[1],
                 "password": f.readline().strip().split("=")[1],
                 "host": f.readline().strip().split("=")[1],
+                "port": f.readline().strip().split("=")[1],
                 "database": f.readline().strip().split("=")[1],
                 "admin_pw": f.readline().strip().split("=")[1]
             }
