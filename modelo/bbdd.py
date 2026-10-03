@@ -1,4 +1,5 @@
 import mysql.connector
+from keyring.backends import null
 from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.pooling import PooledMySQLConnection
 from modelo.Usuario import Usuario
@@ -20,7 +21,7 @@ from modelo.BBDD_Error import BBDD_Error
 # COMMIT;
 
 
-def coneccion(config: dict[str, str]) -> PooledMySQLConnection | MySQLConnectionAbstract | None:
+def connection(config: dict[str, str]) -> PooledMySQLConnection | MySQLConnectionAbstract | None:
     try:
         return mysql.connector.connect(
             host=config["host"],
@@ -48,15 +49,32 @@ def add_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
             data = (usuario.nombre, usuario.apellido_1, usuario.apellido_2, usuario.fecha_nacimiento)
             cursor.execute(sql, data)
             cnx.commit()
-            cursor.close()
         except mysql.connector.Error:
             raise BBDD_Error("Error al insertar usuario")
+        finally:
+            cursor.close()
+
+def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
+        try:
+            cursor = cnx.cursor()
+            sql = "SELECT cod, nombre, apellido_1, apellido_2, fecha_nacimiento FROM usuarios WHERE cod = %s"
+            data = (codigo,)
+            cursor.execute(sql, data)
+            datos = cursor.fetchone()
+            cursor.close()
+
+            return Usuario(str(datos[0]), datos[1], datos[2],datos[3], datos[4])
+        except mysql.connector.Error:
+            raise BBDD_Error("Error al obtener usuario")
+        finally:
+            cursor.close()
 
 
 def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> str:
     formato = formato if formato in ["json", "csv", "yaml", "toml"] else "csv"
     salida: str = ""
     usuarios: list[Usuario] = []  # es más rápido al crear la cadena de texto pero consume más memoria
+
     try:
         cursor = cnx.cursor()
         query = "SELECT * FROM usuarios"
@@ -66,6 +84,8 @@ def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> st
         cursor.close()
     except mysql.connector.Error:
         raise BBDD_Error("Error al descargar la bbdd")
+
+
     match formato:
         case "csv":
             return "\n".join([usu.to_csv() for usu in usuarios])
@@ -75,8 +95,8 @@ def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> st
             return "\n".join([usu.to_yaml() for usu in usuarios])
         case "toml":
             return "\n".join([usu.to_toml() for usu in usuarios])
-    return salida
 
+    return salida
 
 # borrar usuario ejemplo
 # cnx.autocommit = True
