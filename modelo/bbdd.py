@@ -42,17 +42,17 @@ def add_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
                 cursor.close()
 
 
-def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
+def get_usuario(cnx: MySQLConnectionAbstract, codigo: int) -> Usuario:
     cursor = None
     try:
         cursor = cnx.cursor()
         sql = "SELECT nombre, apellido_1, apellido_2, fecha_nacimiento FROM usuarios WHERE cod = %s"
-        data = (codigo,)
+        data = (int(codigo),)
         cursor.execute(sql, data)
         datos = cursor.fetchone()
         if datos is None:
             raise BBDD_Error("El código entregado no existe")
-        return Usuario(codigo, datos[0], datos[1], datos[2], datos[3])
+        return Usuario(str(codigo), datos[0], datos[1], datos[2], datos[3])
     except mysql.connector.Error:
         raise BBDD_Error("Error al obtener usuario")
     finally:

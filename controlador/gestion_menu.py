@@ -48,7 +48,7 @@ def modificar(configuracion: dict[str, str], usuario_modificado: Usuario):
 #             bbdd.close(cnx)
 
 
-def obtener(configuracion: dict[str, str], codigo: str) -> Usuario:
+def obtener(configuracion: dict[str, str], codigo: int) -> Usuario:
     cnx = None
     try:
         cnx = bbdd.connection(configuracion)
@@ -80,5 +80,14 @@ def visualizar(configuracion: dict[str, str]):
     print("Ver")
 
 
-def dar_de_baja(configuracion: dict[str, str], usuario: Usuario):
-    print("Baja")
+def dar_de_baja(configuracion: dict[str, str], codigo: str):
+    cnx = None
+    try:
+        cnx = bbdd.connection(configuracion)
+        lineas = bbdd.borrar_usuario(cnx, codigo)
+        print(f"Se han eliminado {lineas} lineas correctamente")
+    except BBDD_Error as e:
+        print(e)
+    finally:
+        if cnx is not None:
+            bbdd.close(cnx)
