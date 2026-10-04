@@ -6,21 +6,6 @@ from modelo.Usuario import Usuario
 from modelo.BBDD_Error import BBDD_Error
 
 
-# Script de creación de la tabla
-# CREATE TABLE `usuarios` (
-#   `cod` int(11) NOT NULL,
-#   `nombre` varchar(255) NOT NULL,
-#   `apellido_1` varchar(255) NOT NULL,
-#   `apellido_2` varchar(255) NOT NULL,
-#   `fecha_nacimiento` varchar(255) NOT NULL
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
-# ALTER TABLE `usuarios`
-#   ADD PRIMARY KEY (`cod`);
-# ALTER TABLE `usuarios`
-#   MODIFY `cod` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-# COMMIT;
-
-
 def connection(config: dict[str, str]) -> PooledMySQLConnection | MySQLConnectionAbstract | None:
     try:
         return mysql.connector.connect(
@@ -54,20 +39,34 @@ def add_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
         finally:
             cursor.close()
 
-def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
-        try:
-            cursor = cnx.cursor()
-            sql = "SELECT cod, nombre, apellido_1, apellido_2, fecha_nacimiento FROM usuarios WHERE cod = %s"
-            data = (codigo,)
-            cursor.execute(sql, data)
-            datos = cursor.fetchone()
-            cursor.close()
 
-            return Usuario(str(datos[0]), datos[1], datos[2],datos[3], datos[4])
-        except mysql.connector.Error:
-            raise BBDD_Error("Error al obtener usuario")
-        finally:
-            cursor.close()
+def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
+    try:
+        cursor = cnx.cursor()
+        sql = "SELECT nombre, apellido_1, apellido_2, fecha_nacimiento FROM usuarios WHERE cod = %s"
+        data = (codigo,)
+        cursor.execute(sql, data)
+        datos = cursor.fetchone()
+        if datos is None:
+            raise BBDD_Error("El código entregado no existe")
+        return Usuario(codigo, datos[0], datos[1], datos[2], datos[3])
+    except mysql.connector.Error:
+        raise BBDD_Error("Error al obtener usuario")
+    finally:
+        cursor.close()
+
+
+def update_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
+    try:
+        cursor = cnx.cursor()
+        sql = "UPDATE usuarios SET nombre = %s, apellido_1 = %s, apellido_2 = %s, fecha_nacimiento = %s WHERE cod = %s"
+        data = (usuario.nombre, usuario.apellido_1, usuario.apellido_2, usuario.fecha_nacimiento, usuario.cod)
+        cursor.execute(sql, data)
+        cnx.commit()
+    except mysql.connector.Error:
+        raise BBDD_Error("Error al actualizar usuario")
+    finally:
+        cursor.close()
 
 
 def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> str:
@@ -84,7 +83,6 @@ def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> st
         cursor.close()
     except mysql.connector.Error:
         raise BBDD_Error("Error al descargar la bbdd")
-
 
     match formato:
         case "csv":

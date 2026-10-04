@@ -1,5 +1,5 @@
 import vista.menus as v_menus
-from controlador.gestion_menu import dar_de_alta, dar_de_baja, descargar_bbdd, modificar, visualizar
+from controlador.gestion_menu import dar_de_alta, dar_de_baja, descargar_bbdd, modificar, obtener, visualizar
 
 FILE_PATH: str = "conf.txt"
 DEBUG: bool = True
@@ -42,8 +42,10 @@ def run_app(configuracion: dict[str, str]) -> None:
             usuario = v_menus.get_usuario()
             dar_de_alta(configuracion, usuario)
         elif opcion == v_menus.OPCIONES_MENU["Modificar"]:
-            usuario = v_menus.get_usuario()
-            modificar(configuracion, usuario, usuario)
+            codigo = v_menus.get_codigo_usuario()
+            usuario = obtener(configuracion, codigo)
+            usuario_modificado = v_menus.get_modificar_usuario(codigo, usuario)
+            modificar(configuracion, usuario_modificado)
         elif opcion == v_menus.OPCIONES_MENU["Baja"]:
             usuario = v_menus.get_usuario()
             dar_de_baja(configuracion, usuario)
