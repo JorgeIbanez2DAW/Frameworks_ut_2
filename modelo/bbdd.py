@@ -127,3 +127,18 @@ def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> st
 # print(emp_no)
 #  cnx.commit()  Ya no es necesario por el autocommit
 # cursor.close()
+
+def borrar_usuario(cnx: MySQLConnectionAbstract, codigo: int) -> int:
+    cursor = None
+    try:
+        cursor = cnx.cursor()
+        sql = "DELETE FROM usuarios WHERE cod = %s"
+        data = (int(codigo),)
+        cursor.execute(sql, data)
+        cnx.commit()
+        return cursor.rowcount
+    except mysql.connector.Error:
+        raise BBDD_Error("Error al eliminar usuario")
+    finally:
+        if cursor is not None:
+            cursor.close()
