@@ -28,6 +28,26 @@ def modificar(configuracion: dict[str, str], usuario_modificado: Usuario):
         if cnx is not None:
             bbdd.close(cnx)
 
+
+# TODO - Opcion 2 (Pendiente de confirmación profesor)
+# def modificar_campos(configuracion: dict[str, str], usuario: Usuario, usuario_modificado: Usuario):
+#     original = usuario.__serialize__()
+#     modificado = usuario_modificado.__serialize__()
+#     cnx = None
+#
+#     try:
+#         cnx = bbdd.connection(configuracion)
+#         for key, valor in original.items():
+#             if valor != modificado[key]:
+#                 bbdd.update_campo_usuario(cnx, modificado['cod'], key, modificado[key])
+#         print("Modificado correctamente")
+#     except BBDD_Error as e:
+#         print(e)
+#     finally:
+#         if cnx is not None:
+#             bbdd.close(cnx)
+
+
 def obtener(configuracion: dict[str, str], codigo: str) -> Usuario:
     cnx = None
     try:

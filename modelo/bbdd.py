@@ -27,6 +27,7 @@ def close(cnx: MySQLConnectionAbstract) -> None:
 
 
 def add_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
+    cursor = None
     if usuario:
         try:
             cursor = cnx.cursor()
@@ -37,10 +38,12 @@ def add_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
         except mysql.connector.Error:
             raise BBDD_Error("Error al insertar usuario")
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
 
 
 def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
+    cursor = None
     try:
         cursor = cnx.cursor()
         sql = "SELECT nombre, apellido_1, apellido_2, fecha_nacimiento FROM usuarios WHERE cod = %s"
@@ -53,10 +56,12 @@ def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
     except mysql.connector.Error:
         raise BBDD_Error("Error al obtener usuario")
     finally:
-        cursor.close()
+        if cursor is not None:
+            cursor.close()
 
 
 def update_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
+    cursor = None
     try:
         cursor = cnx.cursor()
         sql = "UPDATE usuarios SET nombre = %s, apellido_1 = %s, apellido_2 = %s, fecha_nacimiento = %s WHERE cod = %s"
@@ -66,7 +71,23 @@ def update_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
     except mysql.connector.Error:
         raise BBDD_Error("Error al actualizar usuario")
     finally:
-        cursor.close()
+        if cursor is not None:
+            cursor.close()
+
+# TODO - Opcion 2 (Pendiente de confirmación profesor)
+# def update_campo_usuario(cnx: MySQLConnectionAbstract, cod: str, campo: str, valor_nuevo: str) -> None:
+#     cursor = None
+#     try:
+#         cursor = cnx.cursor()
+#         sql = f"UPDATE usuarios SET {campo} = %s WHERE cod = %s"
+#         data = (valor_nuevo, int(cod))
+#         cursor.execute(sql, data)
+#         cnx.commit()
+#     except mysql.connector.Error:
+#         raise BBDD_Error("Error al actualizar usuario")
+#     finally:
+#         if cursor is not None:
+#             cursor.close()
 
 
 def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> str:
