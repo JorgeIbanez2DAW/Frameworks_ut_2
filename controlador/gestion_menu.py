@@ -85,7 +85,10 @@ def dar_de_baja(configuracion: dict[str, str], codigo: str):
     try:
         cnx = bbdd.connection(configuracion)
         lineas = bbdd.borrar_usuario(cnx, codigo)
-        print(f"Se han eliminado {lineas} lineas correctamente")
+        if lineas == 1:
+            print("Se ha dad2o de baja correctamente")
+        else:
+            print("No existe el usuario")
     except BBDD_Error as e:
         print(e)
     finally:

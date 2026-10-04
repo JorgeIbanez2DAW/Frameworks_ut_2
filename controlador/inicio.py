@@ -1,5 +1,6 @@
 import vista.menus as v_menus
-from controlador.gestion_menu import dar_de_alta, dar_de_baja, descargar_bbdd, modificar, obtener, visualizar, modificar_campos # # TODO - Opcion 2 (Pendiente de confirmación profesor)
+from controlador.gestion_menu import dar_de_alta, dar_de_baja, descargar_bbdd, modificar, obtener, visualizar
+#from controlador.gestion_menu import modificar_campos # TODO - Opcion 2 (Pendiente de confirmación profesor)
 
 FILE_PATH: str = "conf.txt"
 DEBUG: bool = True
@@ -53,11 +54,17 @@ def run_app(configuracion: dict[str, str]) -> None:
         #     usuario_modificado = v_menus.get_modificar_usuario(codigo, usuario)
         #     modificar_campos(configuracion, usuario, usuario_modificado)
         elif opcion == v_menus.OPCIONES_MENU["Baja"]:
-            usuario = v_menus.get_usuario()
-            dar_de_baja(configuracion, usuario)
+            codigo1 = v_menus.get_codigo_usuario()
+            print("Por seguridad, confirme el usuario a dar de baja")
+            codigo2 = v_menus.get_codigo_usuario()
+
+            if codigo1 == codigo2:
+                dar_de_baja(configuracion, codigo1)
+            else:
+                print("Los usuarios no coinciden")
         elif opcion == v_menus.OPCIONES_MENU["Ver"]:
             visualizar(configuracion)
         elif opcion == v_menus.OPCIONES_MENU["Descarga"]:
             formato = v_menus.get_formato()
             descargar_bbdd(configuracion, formato)
-    return None
+            return None
