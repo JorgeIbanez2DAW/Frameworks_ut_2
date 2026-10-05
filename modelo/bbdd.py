@@ -58,6 +58,23 @@ def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
         if cursor is not None:
             cursor.close()
 
+def get_usuarios(cnx: MySQLConnectionAbstract, limit, offset) -> list[Usuario]:
+    cursor = None
+    usuarios = []
+    try:
+        cursor = cnx.cursor()
+        sql = "SELECT * FROM usuarios ORDER BY cod LIMIT %s OFFSET %s"
+        data = (limit, offset)
+        cursor.execute(sql, data)
+        for cod, nombre, apellido_1, apellido_2, fecha_nacimiento in cursor:
+            usuarios.append(Usuario(str(cod), nombre, apellido_1, apellido_2, fecha_nacimiento))
+        return usuarios
+    except mysql.connector.Error:
+        raise BBDD_Error("Error al actualizar usuario")
+    finally:
+        if cursor is not None:
+            cursor.close()
+
 
 def update_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
     cursor = None

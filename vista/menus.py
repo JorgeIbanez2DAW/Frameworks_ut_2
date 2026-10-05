@@ -13,7 +13,7 @@ NO_OPCION: int = -1
 
 
 def imprimir_menu() -> None:
-    print("*  MENU  *")
+    print("\n*  MENU  *")
     print("_" * 10)
     for opcion, valor in OPCIONES_MENU.items():
         print(f"{valor}: {opcion}")
@@ -41,6 +41,9 @@ def get_codigo_usuario() -> str:
     cod = input("Introduce el código del usuario: ")
     return cod
 
+def get_continuar() -> bool:
+    opcion = input("¿Desear visualizar los siguientes? (s/n): ").lower()
+    return True if opcion == "s" or opcion == "si" else False
 
 def get_modificar_usuario(usuario: Usuario) -> Usuario:
     print("Introduce los datos a cambiar del usuario, en caso de no querer modificarlo, pulse enter:")

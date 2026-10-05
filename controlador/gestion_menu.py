@@ -1,6 +1,7 @@
 from modelo.Usuario import Usuario
 from modelo.BBDD_Error import BBDD_Error
 import modelo.bbdd as bbdd
+import vista.menus as v_menus
 
 
 def dar_de_alta(configuracion: dict[str, str], usuario: Usuario = None) -> None:
@@ -57,8 +58,32 @@ def descargar_bbdd(configuracion: dict[str, str], formato: str = "csv"):
             bbdd.close(cnx)
 
 
-def visualizar(configuracion: dict[str, str]):
-    print("Ver")
+def visualizar(configuracion: dict[str, str], limit: int = 10):
+    cnx = None
+    offset = 0
+    fin = False
+
+    try:
+        cnx = bbdd.connection(configuracion)
+
+        while not fin:
+            usuarios = bbdd.get_usuarios(cnx, limit, offset)
+
+            if len(usuarios) == 0:
+                fin = True
+            else:
+                for usuario in usuarios:
+                    print(usuario)
+
+                if len(usuarios) < limit or not v_menus.get_continuar():
+                    fin = True
+                else:
+                    offset += limit
+    except BBDD_Error as e:
+        print(e)
+    finally:
+        if cnx is not None:
+            bbdd.close(cnx)
 
 
 def dar_de_baja(configuracion: dict[str, str], codigo: str):
@@ -67,7 +92,7 @@ def dar_de_baja(configuracion: dict[str, str], codigo: str):
         cnx = bbdd.connection(configuracion)
         lineas = bbdd.borrar_usuario(cnx, codigo)
         if lineas == 1:
-            print("Se ha dad2o de baja correctamente")
+            print("Se ha dado de baja correctamente")
         else:
             print("No existe el usuario")
     except BBDD_Error as e:

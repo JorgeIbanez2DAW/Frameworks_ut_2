@@ -50,7 +50,6 @@ def run_app(configuracion: dict[str, str]) -> None:
             codigo1 = v_menus.get_codigo_usuario()
             print("Por seguridad, confirme el usuario a dar de baja")
             codigo2 = v_menus.get_codigo_usuario()
-
             if codigo1 == codigo2:
                 dar_de_baja(configuracion, codigo1)
             else:
