@@ -1,5 +1,4 @@
 import mysql.connector
-from keyring.backends import null
 from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.pooling import PooledMySQLConnection
 from modelo.Usuario import Usuario
@@ -42,7 +41,7 @@ def add_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
                 cursor.close()
 
 
-def get_usuario(cnx: MySQLConnectionAbstract, codigo: int) -> Usuario:
+def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
     cursor = None
     try:
         cursor = cnx.cursor()
@@ -74,21 +73,6 @@ def update_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
         if cursor is not None:
             cursor.close()
 
-# TODO - Opcion 2 (Pendiente de confirmación profesor)
-# def update_campo_usuario(cnx: MySQLConnectionAbstract, cod: str, campo: str, valor_nuevo: str) -> None:
-#     cursor = None
-#     try:
-#         cursor = cnx.cursor()
-#         sql = f"UPDATE usuarios SET {campo} = %s WHERE cod = %s"
-#         data = (valor_nuevo, int(cod))
-#         cursor.execute(sql, data)
-#         cnx.commit()
-#     except mysql.connector.Error:
-#         raise BBDD_Error("Error al actualizar usuario")
-#     finally:
-#         if cursor is not None:
-#             cursor.close()
-
 
 def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> str:
     formato = formato if formato in ["json", "csv", "yaml", "toml"] else "csv"
@@ -117,16 +101,6 @@ def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> st
 
     return salida
 
-# borrar usuario ejemplo
-# cnx.autocommit = True
-# cursor = cnx.cursor()
-# del_persona = "DELETE FROM personas WHERE cod = 1"
-# print(del_persona)
-# cursor.execute(del_persona)
-# emp_no = cursor.lastrowid
-# print(emp_no)
-#  cnx.commit()  Ya no es necesario por el autocommit
-# cursor.close()
 
 def borrar_usuario(cnx: MySQLConnectionAbstract, codigo: int) -> int:
     cursor = None

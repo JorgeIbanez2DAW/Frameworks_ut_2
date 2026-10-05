@@ -42,7 +42,7 @@ def get_codigo_usuario() -> str:
     return cod
 
 
-def get_modificar_usuario(cod: str, usuario: Usuario) -> Usuario:
+def get_modificar_usuario(usuario: Usuario) -> Usuario:
     print("Introduce los datos a cambiar del usuario, en caso de no querer modificarlo, pulse enter:")
     nombre = input(f"Nombre actual: {usuario.nombre} "
                    f"-> Nuevo nombre: ") or usuario.nombre
@@ -53,7 +53,7 @@ def get_modificar_usuario(cod: str, usuario: Usuario) -> Usuario:
     fecha_nacimiento = input(f"Fecha de nacimiento actual: {usuario.fecha_nacimiento} " 
                              f"-> Nueva fecha (DD/MM/AAAA): ") or usuario.fecha_nacimiento
 
-    return Usuario(cod, nombre, apellido_1, apellido_2, fecha_nacimiento)
+    return Usuario(usuario.cod, nombre, apellido_1, apellido_2, fecha_nacimiento)
 
 
 def get_formato() -> str:
