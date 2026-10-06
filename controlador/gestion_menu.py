@@ -30,7 +30,7 @@ def modificar(configuracion: dict[str, str], usuario_modificado: Usuario):
             bbdd.close(cnx)
 
 
-def obtener(configuracion: dict[str, str], codigo: str) -> Usuario | None:
+def obtener(configuracion: dict[str, str], codigo: str) -> Usuario:
     cnx = None
     try:
         cnx = bbdd.connection(configuracion)
@@ -86,11 +86,11 @@ def visualizar(configuracion: dict[str, str], limit: int = 10):
             bbdd.close(cnx)
 
 
-def dar_de_baja(configuracion: dict[str, str], codigo: str):
+def dar_de_baja(configuracion: dict[str, str], usuario: Usuario):
     cnx = None
     try:
         cnx = bbdd.connection(configuracion)
-        lineas = bbdd.borrar_usuario(cnx, codigo)
+        lineas = bbdd.borrar_usuario(cnx, usuario.cod)
         if lineas == 1:
             print("Se ha dado de baja correctamente")
         else:

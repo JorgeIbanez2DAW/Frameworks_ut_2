@@ -41,9 +41,17 @@ def get_codigo_usuario() -> str:
     cod = input("Introduce el código del usuario: ")
     return cod
 
+
+def pedir_confirmacion(usuario: Usuario) -> bool:
+    print("Usuario indicado:", usuario)
+    opcion = input("¿Desea confirmar la acción? (s/n): ").lower()
+    return True if opcion == "s" or opcion == "si" else False
+
+
 def get_continuar() -> bool:
     opcion = input("¿Desear visualizar los siguientes? (s/n): ").lower()
     return True if opcion == "s" or opcion == "si" else False
+
 
 def get_modificar_usuario(usuario: Usuario) -> Usuario:
     print("Introduce los datos a cambiar del usuario, en caso de no querer modificarlo, pulse enter:")
@@ -53,7 +61,7 @@ def get_modificar_usuario(usuario: Usuario) -> Usuario:
                        f"-> Nuevo primer apellido: ") or usuario.apellido_1
     apellido_2 = input(f"Segundo apellido actual: {usuario.apellido_2}. "
                        f"-> Nuevo segundo apellido: ") or usuario.apellido_2
-    fecha_nacimiento = input(f"Fecha de nacimiento actual: {usuario.fecha_nacimiento} " 
+    fecha_nacimiento = input(f"Fecha de nacimiento actual: {usuario.fecha_nacimiento} "
                              f"-> Nueva fecha (DD/MM/AAAA): ") or usuario.fecha_nacimiento
 
     return Usuario(usuario.cod, nombre, apellido_1, apellido_2, fecha_nacimiento)

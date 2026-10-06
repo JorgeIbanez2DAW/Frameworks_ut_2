@@ -53,5 +53,5 @@ class Usuario:
                f"\nfecha_nacimiento: {self.fecha_nacimiento}"
 
     def to_toml(self) -> str:
-        return f'cod = "{self.cod}"\nnombre = "{self.nombre}"\napellido_1 = "{self.apellido_1}"'\
+        return f'cod = "{self.cod}"\nnombre = "{self.nombre}"\napellido_1 = "{self.apellido_1}"' \
                '\napellido_2 = "{self.apellido_2}"\nfecha_nacimiento = "{self.fecha_nacimiento}"'

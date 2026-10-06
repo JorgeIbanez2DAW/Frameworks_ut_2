@@ -40,23 +40,22 @@ def run_app(configuracion: dict[str, str]) -> None:
             fin = True
         elif opcion == v_menus.OPCIONES_MENU["Alta"]:
             usuario = v_menus.get_usuario()
-            dar_de_alta(configuracion, usuario)
+            if usuario is not None and v_menus.pedir_confirmacion(usuario):
+                dar_de_alta(configuracion, usuario)
         elif opcion == v_menus.OPCIONES_MENU["Modificar"]:
             codigo = v_menus.get_codigo_usuario()
             usuario = obtener(configuracion, codigo)
-            usuario_modificado = v_menus.get_modificar_usuario(usuario)
-            modificar(configuracion, usuario_modificado)
+            if usuario is not None and v_menus.pedir_confirmacion(usuario):
+                usuario_modificado = v_menus.get_modificar_usuario(usuario)
+                modificar(configuracion, usuario_modificado)
         elif opcion == v_menus.OPCIONES_MENU["Baja"]:
-            codigo1 = v_menus.get_codigo_usuario()
-            print("Por seguridad, confirme el usuario a dar de baja")
-            codigo2 = v_menus.get_codigo_usuario()
-            if codigo1 == codigo2:
-                dar_de_baja(configuracion, codigo1)
-            else:
-                print("Los usuarios no coinciden")
+            codigo = v_menus.get_codigo_usuario()
+            usuario = obtener(configuracion, codigo)
+            if usuario is not None and v_menus.pedir_confirmacion(usuario):
+                dar_de_baja(configuracion, usuario)
         elif opcion == v_menus.OPCIONES_MENU["Ver"]:
             visualizar(configuracion)
         elif opcion == v_menus.OPCIONES_MENU["Descarga"]:
             formato = v_menus.get_formato()
             descargar_bbdd(configuracion, formato)
-            return None
+    return None

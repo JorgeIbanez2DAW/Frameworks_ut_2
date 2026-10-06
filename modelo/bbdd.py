@@ -58,6 +58,7 @@ def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
         if cursor is not None:
             cursor.close()
 
+
 def get_usuarios(cnx: MySQLConnectionAbstract, limit, offset) -> list[Usuario]:
     cursor = None
     usuarios = []
