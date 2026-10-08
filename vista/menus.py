@@ -1,27 +1,43 @@
 from modelo.Usuario import Usuario
 
-OPCIONES_MENU: dict[str, int] = {
-    "Alta": 1,
-    "Modificar": 2,
-    "Baja": 3,
-    "Ver": 4,
-    "Descarga": 5,
-    "Salir": 6
-}
-
-NO_OPCION: int = -1
-
 
 def imprimir_menu() -> None:
+    opciones_menu: dict[str, int] = {
+        "Alta": 1,
+        "Modificar": 2,
+        "Baja": 3,
+        "Ver": 4,
+        "Descarga": 5,
+        "Salir": 6
+    }
+
     print("\n*  MENU  *")
     print("_" * 10)
-    for opcion, valor in OPCIONES_MENU.items():
+    for opcion, valor in opciones_menu.items():
         print(f"{valor}: {opcion}")
     print("_" * 10, "\n")
 
 
 def pedir_opcion() -> int:
-    return int(input("¿Opcion?"))
+    return int(input("¿Opción? > "))
+
+
+def imprimir_mensajes(opcion: int) -> None:
+    match opcion:
+        case 1:
+            print("Añadido correctamente")
+        case 2:
+            print("Modificado correctamente")
+        case 3:
+            print("Descargado correctamente")
+        case 4:
+            print("Se ha dado de baja correctamente")
+        case 5:
+            print("No existe el usuario")
+
+
+def imprimir(informacion: str | Usuario) -> None:
+    print(informacion)
 
 
 def get_opcion(opcion: str) -> int:
@@ -45,12 +61,12 @@ def get_codigo_usuario() -> str:
 def pedir_confirmacion(usuario: Usuario) -> bool:
     print("Usuario indicado:", usuario)
     opcion = input("¿Desea confirmar la acción? (s/n): ").lower()
-    return True if opcion == "s" or opcion == "si" else False
+    return opcion == "s" or opcion == "si"
 
 
 def get_continuar() -> bool:
     opcion = input("¿Desear visualizar los siguientes? (s/n): ").lower()
-    return True if opcion == "s" or opcion == "si" else False
+    return opcion == "s" or opcion == "si"
 
 
 def get_modificar_usuario(usuario: Usuario) -> Usuario:
@@ -59,7 +75,7 @@ def get_modificar_usuario(usuario: Usuario) -> Usuario:
                    f"-> Nuevo nombre: ") or usuario.nombre
     apellido_1 = input(f"Primer apellido actual: {usuario.apellido_1} "
                        f"-> Nuevo primer apellido: ") or usuario.apellido_1
-    apellido_2 = input(f"Segundo apellido actual: {usuario.apellido_2}. "
+    apellido_2 = input(f"Segundo apellido actual: {usuario.apellido_2} "
                        f"-> Nuevo segundo apellido: ") or usuario.apellido_2
     fecha_nacimiento = input(f"Fecha de nacimiento actual: {usuario.fecha_nacimiento} "
                              f"-> Nueva fecha (DD/MM/AAAA): ") or usuario.fecha_nacimiento

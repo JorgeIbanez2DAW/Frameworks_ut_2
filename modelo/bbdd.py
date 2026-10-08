@@ -1,5 +1,5 @@
 import mysql.connector
-from mysql.connector.abstracts import MySQLConnectionAbstract
+from mysql.connector.abstracts import MySQLConnectionAbstract, MySQLCursorAbstract
 from mysql.connector.pooling import PooledMySQLConnection
 from modelo.Usuario import Usuario
 from modelo.BBDD_Error import BBDD_Error
@@ -26,7 +26,7 @@ def close(cnx: MySQLConnectionAbstract) -> None:
 
 
 def add_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
-    cursor = None
+    cursor: None | MySQLCursorAbstract = None
     if usuario:
         try:
             cursor = cnx.cursor()
@@ -41,17 +41,16 @@ def add_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
                 cursor.close()
 
 
-def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
-    cursor = None
+def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario | None:
+    cursor: None | MySQLCursorAbstract = None
     try:
         cursor = cnx.cursor()
         sql = "SELECT nombre, apellido_1, apellido_2, fecha_nacimiento FROM usuarios WHERE cod = %s"
         data = (int(codigo),)
         cursor.execute(sql, data)
         datos = cursor.fetchone()
-        if datos is None:
-            raise BBDD_Error("El código entregado no existe")
-        return Usuario(str(codigo), datos[0], datos[1], datos[2], datos[3])
+        if datos is not None:
+            return Usuario(str(codigo), datos[0], datos[1], datos[2], datos[3])
     except mysql.connector.Error:
         raise BBDD_Error("Error al obtener usuario")
     finally:
@@ -59,9 +58,9 @@ def get_usuario(cnx: MySQLConnectionAbstract, codigo: str) -> Usuario:
             cursor.close()
 
 
-def get_usuarios(cnx: MySQLConnectionAbstract, limit, offset) -> list[Usuario]:
-    cursor = None
-    usuarios = []
+def get_usuarios(cnx: MySQLConnectionAbstract, limit: int, offset: int) -> list[Usuario]:
+    cursor: None | MySQLCursorAbstract = None
+    usuarios: list = []
     try:
         cursor = cnx.cursor()
         sql = "SELECT * FROM usuarios ORDER BY cod LIMIT %s OFFSET %s"
@@ -71,14 +70,14 @@ def get_usuarios(cnx: MySQLConnectionAbstract, limit, offset) -> list[Usuario]:
             usuarios.append(Usuario(str(cod), nombre, apellido_1, apellido_2, fecha_nacimiento))
         return usuarios
     except mysql.connector.Error:
-        raise BBDD_Error("Error al actualizar usuario")
+        raise BBDD_Error("Error al obtener usuario")
     finally:
         if cursor is not None:
             cursor.close()
 
 
 def update_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
-    cursor = None
+    cursor: None | MySQLCursorAbstract = None
     try:
         cursor = cnx.cursor()
         sql = "UPDATE usuarios SET nombre = %s, apellido_1 = %s, apellido_2 = %s, fecha_nacimiento = %s WHERE cod = %s"
@@ -92,20 +91,32 @@ def update_usuario(cnx: MySQLConnectionAbstract, usuario: Usuario) -> None:
             cursor.close()
 
 
-def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> str:
+def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv", limit: int = 10) -> str:
     formato = formato if formato in ["json", "csv", "yaml", "toml"] else "csv"
+    cursor: None | MySQLCursorAbstract = None
     salida: str = ""
-    usuarios: list[Usuario] = []  # es más rápido al crear la cadena de texto pero consume más memoria
+    offset: int = 0
+    fin: bool = False
+    usuarios: list[Usuario] = []
 
     try:
         cursor = cnx.cursor()
-        query = "SELECT * FROM usuarios"
-        cursor.execute(query)
-        for cod, nombre, apellido_1, apellido_2, fecha_nacimiento in cursor:
-            usuarios.append(Usuario(str(cod), nombre, apellido_1, apellido_2, fecha_nacimiento))
-        cursor.close()
+        while not fin:
+            sql = "SELECT * FROM usuarios LIMIT %s OFFSET %s"
+            data = (limit, offset)
+            cursor.execute(sql, data)
+            lista = cursor.fetchall()
+            if not lista:
+                fin = True
+            else:
+                for cod, nombre, apellido_1, apellido_2, fecha_nacimiento in lista:
+                    usuarios.append(Usuario(str(cod), nombre, apellido_1, apellido_2, fecha_nacimiento))
+            offset += limit
     except mysql.connector.Error:
         raise BBDD_Error("Error al descargar la bbdd")
+    finally:
+        if cursor is not None:
+            cursor.close()
 
     match formato:
         case "csv":
@@ -117,11 +128,9 @@ def descargar_usuarios(cnx: MySQLConnectionAbstract, formato: str = "csv") -> st
         case "toml":
             return "\n".join([usu.to_toml() for usu in usuarios])
 
-    return salida
-
 
 def borrar_usuario(cnx: MySQLConnectionAbstract, codigo: int) -> int:
-    cursor = None
+    cursor: None | MySQLCursorAbstract = None
     try:
         cursor = cnx.cursor()
         sql = "DELETE FROM usuarios WHERE cod = %s"
